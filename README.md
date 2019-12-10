@@ -3,5 +3,5 @@ Comando para generar XML con usuarios de la plataforma Oracle iLearning
 
 # Primera versión
 
-Recoge la información del fichero data/ejemplo.csv y muestra en la salida estándar el contenido de fichero.
+Recoge la información del fichero data/ejemplo.csv y muestra en la salida estándar el contenido de fichero XML con los usuarios a importar.
  
