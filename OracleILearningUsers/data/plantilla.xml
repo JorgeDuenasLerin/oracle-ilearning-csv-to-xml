@@ -1,53 +1,78 @@
-<xsl:stylesheet version="2.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xs="http://www.w3.org/2001/XMLSchema" exclude-result-prefixes="xs">
-    <xsl:output indent="yes"/>
-    <xsl:strip-space elements="*"/>
+<xsl:transform
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:str="http://exslt.org/strings"
+  xmlns="http://www.imsglobal.org/xsd/imsep_rootv1p01"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.imsglobal.org/xsd/imsep_rootv1p01 http://ilearning.oracle.com/ilearn/en/admin/dtd/imsep_rootv1p01.xsd"
+  version="2.0"
+  exclude-result-prefixes="xs str xsi">
+  
+  <xsl:param name="csv-encoding" as="xs:string" select="'UTF-8'"/>
+  <xsl:param name="csv-uri" as="xs:string" select="'ejemplo.csv'"/>
+  
+  <xsl:variable name="modo_de_inserccion" select="'2'" />
+  
+  <xsl:template name="main" match="/">
+  	<xsl:param name="anio" />
+  	<xsl:param name="df_pass" />
+  	<xsl:param name="tutor" />	
+	
+  	<xsl:variable name="file_content" select="unparsed-text($csv-uri, $csv-encoding)"/>
+  	<xsl:variable name="header" select="'Curso'" />
+ 	
+	<enterprise xmlns="http://www.imsglobal.org/xsd/imsep_rootv1p01"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.imsglobal.org/xsd/imsep_rootv1p01 http://ilearning.oracle.com/ilearn/en/admin/dtd/imsep_rootv1p01.xsd">
+	
+	<properties>
+		<datasource>Development</datasource>
+		<datetime></datetime>
+	</properties>
+	
+	<xsl:for-each select="tokenize($file_content, '\n\r?')">
+	  	<xsl:if test="not(starts-with(., $header))">
+			<xsl:call-template name="linea">
+				<xsl:with-param name="anio" select = "$anio" />
+				<xsl:with-param name="df_pass" select = "$df_pass" />
+				<xsl:with-param name="tutor" select = "$tutor" />
+			</xsl:call-template>	
+		</xsl:if>
+    </xsl:for-each>
 
-    <xsl:param name="csv-encoding" as="xs:string" select="'iso-8859-1'"/>
-    <xsl:param name="csv-uri" as="xs:string" select="'data/ejemplo.csv'"/>
-
-    <xsl:template match="/" name="csv2xml">
-        <Claims>
-            <xsl:choose>
-                <xsl:when test="unparsed-text-available($csv-uri, $csv-encoding)">
-                    <xsl:variable name="csv" select="unparsed-text($csv-uri, $csv-encoding)"/>
-                    <!--Get Header-->
-                    <xsl:variable name="header-tokens" as="xs:string*">
-                        <xsl:analyze-string select="$csv" regex="\r\n?|\n">
-                            <xsl:non-matching-substring>
-                                <xsl:if test="position()=1">
-                                    <xsl:copy-of select="tokenize(.,',')"/>                                        
-                                </xsl:if>
-                            </xsl:non-matching-substring>
-                        </xsl:analyze-string>
-                    </xsl:variable>                    
-                    <xsl:analyze-string select="$csv" regex="\r\n?|\n">
-                        <xsl:non-matching-substring>
-                            <xsl:if test="not(position()=1)">
-                                <Claim>
-                                    <xsl:for-each select="tokenize(.,',')">
-                                        <xsl:variable name="pos" select="position()"/>
-                                        <xsl:element name="{$header-tokens[$pos]}">
-                                            <xsl:value-of select="."/>
-                                        </xsl:element>
-                                    </xsl:for-each>
-                                </Claim>
-                            </xsl:if>
-                        </xsl:non-matching-substring>
-                    </xsl:analyze-string>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:variable name="error">
-                        <xsl:text>Error reading "</xsl:text>
-                        <xsl:value-of select="$csv-uri"/>
-                        <xsl:text>" (encoding "</xsl:text>
-                        <xsl:value-of select="$csv-encoding"/>
-                        <xsl:text>").</xsl:text>
-                    </xsl:variable>
-                    <xsl:message><xsl:value-of select="$error"/></xsl:message>
-                    <xsl:value-of select="$error"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </Claims>
-    </xsl:template>
-
-</xsl:stylesheet>
+	</enterprise>
+	    
+  </xsl:template>
+  
+  <xsl:template name="linea">
+  	<xsl:param name="anio" />
+  	<xsl:param name="df_pass" />
+  	<xsl:param name="tutor" />
+  	
+  	<xsl:variable name="datosLinea" select="tokenize(., ';')"/>
+  	
+  	<person>
+  		<xsl:attribute name="recstatus">
+  			<xsl:value-of select="$modo_de_inserccion" />
+  		</xsl:attribute>
+  		<sourcedid><source></source><id></id></sourcedid>
+  		<userid><xsl:value-of select="$anio" />_<xsl:value-of select="$datosLinea[1]" />_<xsl:value-of select="$datosLinea[5]" /></userid>
+  		<name><fn><xsl:value-of select="$datosLinea[4]" /> <xsl:value-of select="$datosLinea[3]" /></fn></name>
+  		<email><xsl:value-of select="$datosLinea[5]" /></email>
+  		<extension>
+  			<Account_Password><xsl:value-of select="$df_pass" /></Account_Password>
+  			<StartDate><xsl:value-of  select="format-dateTime(current-dateTime(),'[Y0001]-[M01]-[D01] [H01].[m01].[s]')"/></StartDate>
+  			<managerUsername><xsl:value-of select="$tutor" /></managerUsername>
+  			<allowUpdate>Y</allowUpdate>
+  			<CusAttr name="Job_Role" value="Student"/>
+  			<CusAttr name="School_Name" value="JDLC"/>
+  			<CusAttr name="Year X" value ="JFoS_esp"/>
+  			<CusAttr name="Job_Role" value="Student"/>
+  			<CusAttr name="School_Name" value="JDLC"/>
+  			<CusAttr name="Year R" value ="DFoS_esp"/>
+  		</extension>
+  	</person>
+  	
+  	
+  </xsl:template>
+</xsl:transform>

@@ -3,6 +3,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.transform.stream.StreamSource;
 
@@ -17,8 +19,12 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 
 import net.sf.saxon.s9api.Processor;
+import net.sf.saxon.s9api.QName;
 import net.sf.saxon.s9api.SaxonApiException;
 import net.sf.saxon.s9api.Serializer;
+import net.sf.saxon.s9api.XdmAtomicValue;
+import net.sf.saxon.s9api.XdmItem;
+import net.sf.saxon.s9api.XdmValue;
 import net.sf.saxon.s9api.Xslt30Transformer;
 import net.sf.saxon.s9api.XsltCompiler;
 import net.sf.saxon.s9api.XsltExecutable;
@@ -29,17 +35,39 @@ import net.sf.saxon.s9api.XsltExecutable;
  */
 public class Principal {
 
-	public static void transformData(String stylesheetPath, String csvDataPath) throws SaxonApiException{
-		Processor processor = new Processor(false);
+	private static String TEMPLATE = "data/plantilla.xml";
+	
+	/***
+	 * 
+	 * @param csvDataPath
+	 * @param anio
+	 * @param df_pass
+	 * @param tutor
+	 * @throws SaxonApiException
+	 */
+	public static void transformData(
+			String csvDataPath,
+			String anio,
+			String df_pass,
+			String tutor
+			) throws SaxonApiException{
+        Processor processor = new Processor(false);
         XsltCompiler compiler = processor.newXsltCompiler();
-        XsltExecutable stylesheet = compiler.compile(new StreamSource(new File("styles/books.xsl")));
-        Serializer out = processor.newSerializer(new File("books.html"));
-        out.setOutputProperty(Serializer.Property.METHOD, "html");
+        XsltExecutable exp = compiler.compile(new StreamSource(new File(TEMPLATE)));
+        Serializer out = processor.newSerializer(System.out);
+        out.setOutputProperty(Serializer.Property.METHOD, "xml");
         out.setOutputProperty(Serializer.Property.INDENT, "yes");
-        Xslt30Transformer trans = stylesheet.load30();
-        trans.transform(new StreamSource(new File("data/books.xml")), out);
-
-        System.out.println("Output written to books.html");
+        Xslt30Transformer trans = exp.load30();
+        
+        Map<QName, XdmValue> parameters = new HashMap<QName, XdmValue>();
+        
+        parameters.put(new QName("anio"), new XdmAtomicValue(anio));
+        parameters.put(new QName("df_pass"), new XdmAtomicValue(df_pass));
+        parameters.put(new QName("tutor"), new XdmAtomicValue(tutor));
+        
+		trans.setInitialTemplateParameters(parameters, false);
+		
+        trans.callTemplate(new QName("main"), out);
 	}
 	
 	/**
@@ -58,32 +86,13 @@ public class Principal {
 		CommandLineParser parser = new DefaultParser();
 		CommandLine cmd = parser.parse( options, args);
 		
-		transformData("data/plantilla.xml", "");
 		
-		
-		/*
-		String row;
-		
-		ArrayList<Persona> listado = new ArrayList<Persona>();
-		
-		BufferedReader csvReader = new BufferedReader(new FileReader("./data/ejemplo.csv"));
-		csvReader.readLine(); // Leer línea de cabecera
-		while ((row = csvReader.readLine()) != null) {
-		    String[] data = row.split(";");
-		    Persona p = new Persona(
-		    					General.AÑO,
-		    					data[0], // OU
-		    					data[1], // DNI
-		    					data[2], // Apellido
-		    					data[3], // Nombre
-		    					data[4]  // Correo
-		    				);
-		    listado.add(p);
-		}
-		csvReader.close();
-		
-		System.out.println(General.getFileContent(listado));
-		*/
+		transformData(
+				"data/ejemplo.csv",
+				"19_20",
+				"jdlccambiala",
+				"jorge_duenas_lerin"
+			);
 	}
 
 }
