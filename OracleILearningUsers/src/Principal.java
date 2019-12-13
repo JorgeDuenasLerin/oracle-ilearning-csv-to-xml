@@ -11,6 +11,8 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.MissingOptionException;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 /**
@@ -45,15 +47,21 @@ public class Principal {
 	 * @param tutor
 	 * @throws SaxonApiException
 	 */
+	
 	public static void transformData(
 			String csvDataPath,
 			String anio,
 			String df_pass,
 			String tutor
-			) throws SaxonApiException{
+			) throws SaxonApiException {
+		
         Processor processor = new Processor(false);
         XsltCompiler compiler = processor.newXsltCompiler();
-        XsltExecutable exp = compiler.compile(new StreamSource(new File(TEMPLATE)));
+        XsltExecutable exp = compiler.compile(new StreamSource(
+        		Principal.class.getResourceAsStream(TEMPLATE)
+        									)
+        								);
+        
         Serializer out = processor.newSerializer(System.out);
         out.setOutputProperty(Serializer.Property.METHOD, "xml");
         out.setOutputProperty(Serializer.Property.INDENT, "yes");
@@ -70,29 +78,42 @@ public class Principal {
         trans.callTemplate(new QName("main"), out);
 	}
 	
+	
 	/**
 	 * @param args
 	 * @throws IOException 
 	 * @throws ParseException 
 	 * @throws SaxonApiException 
 	 */
-	public static void main(String[] args) throws ParseException, SaxonApiException{
+	public static void main(String[] args) throws SaxonApiException{
 		
 		final Options options = new Options();
-		options.addOption(new Option("d", "debug", false, "Turn on debug."));
-		options.addOption(new Option("e", "extract", false, "Turn on extract."));
-		options.addOption(new Option("o", "option", true, "Turn on option with argument."));
+		
+		options.addOption(
+					Option.builder("d")
+						.longOpt("datos")
+						.argName("datos")
+						.required()
+						.build()
+				);
+				
 		
 		CommandLineParser parser = new DefaultParser();
-		CommandLine cmd = parser.parse( options, args);
 		
-		
-		transformData(
-				"data/ejemplo.csv",
-				"19_20",
-				"jdlccambiala",
-				"jorge_duenas_lerin"
-			);
+		try {
+			CommandLine cmd = parser.parse( options, args);
+			transformData(
+					"data/ejemplo.csv",
+					"19_20",
+					"jdlccambiala",
+					"jorge_duenas_lerin"
+				);
+		} catch (ParseException pe) {
+			System.out.println("Error en parámetros");
+			System.out.println(pe.getMessage());
+			HelpFormatter formatter = new HelpFormatter();
+			formatter.printHelp( "opciones", options );
+		}
 	}
 
 }

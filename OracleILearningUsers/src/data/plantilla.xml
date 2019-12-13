@@ -9,7 +9,7 @@
   exclude-result-prefixes="xs str xsi">
   
   <xsl:param name="csv-encoding" as="xs:string" select="'UTF-8'"/>
-  <xsl:param name="csv-uri" as="xs:string" select="'ejemplo.csv'"/>
+  <xsl:param name="csv-uri" as="xs:string" select="'data/ejemplo.csv'"/>
   
   <xsl:variable name="modo_de_inserccion" select="'2'" />
   
