@@ -40,6 +40,7 @@ PROF;0;P***z;I**o;j***5@gmail.com
 
 Los usuarios creados serán:
 19_20_PROF_<email>
+
 ``` <PREFIJO>_<UNIDAD_ORGANIZATIVA_DEL_CSV>_<EMAIL> ```
 
 De esta forma se pueden hacer filtros por año y clase
