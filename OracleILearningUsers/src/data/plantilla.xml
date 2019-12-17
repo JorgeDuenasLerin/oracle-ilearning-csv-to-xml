@@ -9,14 +9,17 @@
   exclude-result-prefixes="xs str xsi">
   
   <xsl:param name="csv-encoding" as="xs:string" select="'UTF-8'"/>
-  <xsl:param name="csv-uri" as="xs:string" select="'data/ejemplo.csv'"/>
+  
   
   <xsl:variable name="modo_de_inserccion" select="'2'" />
   
   <xsl:template name="main" match="/">
+  	<xsl:param name="csv-uri" as="xs:string"/>
+  	
   	<xsl:param name="anio" />
   	<xsl:param name="df_pass" />
-  	<xsl:param name="tutor" />	
+  	<xsl:param name="tutor" />
+  	<xsl:param name="extendido" />
 	
   	<xsl:variable name="file_content" select="unparsed-text($csv-uri, $csv-encoding)"/>
   	<xsl:variable name="header" select="'Curso'" />
@@ -31,11 +34,12 @@
 	</properties>
 	
 	<xsl:for-each select="tokenize($file_content, '\n\r?')">
-	  	<xsl:if test="not(starts-with(., $header))">
+	  	<xsl:if test="not(starts-with(., $header)) and (. != '')">
 			<xsl:call-template name="linea">
 				<xsl:with-param name="anio" select = "$anio" />
 				<xsl:with-param name="df_pass" select = "$df_pass" />
 				<xsl:with-param name="tutor" select = "$tutor" />
+				<xsl:with-param name="extendido" select = "$extendido" />
 			</xsl:call-template>	
 		</xsl:if>
     </xsl:for-each>
@@ -48,6 +52,8 @@
   	<xsl:param name="anio" />
   	<xsl:param name="df_pass" />
   	<xsl:param name="tutor" />
+  	
+  	<xsl:param name="extendido" />
   	
   	<xsl:variable name="datosLinea" select="tokenize(., ';')"/>
   	
@@ -64,12 +70,34 @@
   			<StartDate><xsl:value-of  select="format-dateTime(current-dateTime(),'[Y0001]-[M01]-[D01] [H01].[m01].[s]')"/></StartDate>
   			<managerUsername><xsl:value-of select="$tutor" /></managerUsername>
   			<allowUpdate>Y</allowUpdate>
-  			<CusAttr name="Job_Role" value="Student"/>
-  			<CusAttr name="School_Name" value="JDLC"/>
-  			<CusAttr name="Year X" value ="JFoS_esp"/>
-  			<CusAttr name="Job_Role" value="Student"/>
-  			<CusAttr name="School_Name" value="JDLC"/>
-  			<CusAttr name="Year R" value ="DFoS_esp"/>
+  			
+  			<xsl:if test="not($extendido)">
+	  			<CusAttr name="Job_Role" value="Student"/>
+	  			<CusAttr name="School_Name" value="JDLC"/>
+	  			<CusAttr name="Year X" value ="JFoS_esp"/>
+	  			<CusAttr name="Job_Role" value="Student"/>
+	  			<CusAttr name="School_Name" value="JDLC"/>
+	  			<CusAttr name="Year R" value ="DFoS_esp"/>
+  			</xsl:if>
+  			
+  			<xsl:if test="$extendido">
+	  			<CusAttr name="Year BB" value = "ADFoT"/>
+				<CusAttr name="Year GG" value = "AiMLT"/>
+				<CusAttr name="Year DD" value = "BDFoT"/>
+				<CusAttr name="Year K" value = "CURT"/>
+				<CusAttr name="Year" value = "DBT"/>
+				<CusAttr name="Year M" value = "DBT_esp"/>
+				<CusAttr name="Year I" value = "DFoT"/>
+				<CusAttr name="Year R" value = "DFoT_esp"/>
+				<CusAttr name="Year D" value = "JFT"/>
+				<CusAttr name="Year G" value = "JFT_esp"/>
+				<CusAttr name="Year J" value = "JFoT"/>
+				<CusAttr name="Year X" value = "JFoT_esp"/>
+				<CusAttr name="Year H" value = "JPT"/>
+				<CusAttr name="Year C" value = "PLSQLT"/>
+				<CusAttr name="Academy_Manager" value = "Y"/>
+				<CusAttr name="Job_Role" value = "teacher"/>
+			</xsl:if>
   		</extension>
   	</person>
   	
