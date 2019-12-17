@@ -44,3 +44,35 @@ Los usuarios creados serán:
 ``` <PREFIJO>_<UNIDAD_ORGANIZATIVA_DEL_CSV>_<EMAIL> ```
 
 De esta forma se pueden hacer filtros por año y clase
+
+## Explicación en discord
+
+
+@everyone
+Buenos días,
+
+Tenéis disponibles los usuarios para acceder al material de certificaciones.
+
+La plataforma web es un poco basura y para organizar a los usuarios tiene que ser por nombre, no permite otra forma de organización. Además el recuérdame está mal implementado y no funciona.
+
+
+Vuestro nombre de usuarios es:
+
+"19_20_DAW1V_email"
+
+Ejemplo:
+Mi email es jorge@gmail.com
+
+Mi usuario es:
+"19_20_DAW1V_jorge@gmail.com"
+
+La contraseña establecida es :
+*****
+
+Por favor, probad a ver si podéis acceder. Os debe aparecer el temario de Java y Bases de datos
+
+Para acceder debéis entrar en:
+https://ilearning.oracle.com/ilearn/en/learner/jsp/login.jsp?site=OracleAcad&action=1100
+
+El proyecto de automatización está aquí:
+https://github.com/JorgeDuenasLerin/oracle-ilearning-csv-to-xml

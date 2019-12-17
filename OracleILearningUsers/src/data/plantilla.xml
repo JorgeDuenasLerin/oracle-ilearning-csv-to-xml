@@ -63,7 +63,7 @@
   		</xsl:attribute>
   		<sourcedid><source></source><id></id></sourcedid>
   		<userid><xsl:value-of select="$anio" />_<xsl:value-of select="$datosLinea[1]" />_<xsl:value-of select="$datosLinea[5]" /></userid>
-  		<name><fn><xsl:value-of select="$datosLinea[4]" /> <xsl:value-of select="$datosLinea[3]" /></fn></name>
+  		<name><fn><xsl:value-of select="$datosLinea[4]" />, <xsl:value-of select="$datosLinea[3]" /></fn></name>
   		<email><xsl:value-of select="$datosLinea[5]" /></email>
   		<extension>
   			<Account_Password><xsl:value-of select="$df_pass" /></Account_Password>
